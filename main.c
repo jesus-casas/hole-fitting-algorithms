@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
     // Define structure for memory block
-    struct memory_block {
+    typedef struct memory_block {
         int block_id;
         int block_size;
         int start_address;
@@ -13,11 +13,12 @@
 
     // Declare global variables
     int physical_memory_size;
-    
+    memory_block *head = NULL;
 
     // Function declarations
     void enter_parameters();
-    void allocate_memory(int);
+    void allocate_memory_first_fit();
+    void allocate_memory_best_fit();
     void deallocate_memory();
     void defragment_memory();
     void print_blocks();
@@ -25,9 +26,46 @@
 
     // Enter parameters function
     void enter_parameters() {
-    printf("Enter size of physical memory: ");
-    scanf("%d", &physical_memory_size);
-}
+        printf("Enter size of physical memory: ");
+        scanf("%d", &physical_memory_size);
+    }
+
+    // Allocate memory function
+    void allocate_memory_first_fit() {
+
+    }
+
+    // Allocate memory function
+    void allocate_memory_best_fit() {
+
+    }
+
+    // Deallocate memory function
+    void deallocate_memory() {
+
+    }
+
+    // Defragment memory function
+    void defragment_memory() {
+
+    }
+
+    // Print blocks function
+    void print_blocks() {
+        memory_block *current = head;
+        printf("ID     \tStart Address\tEnd Address\n");
+        printf("--------------------------------------\n");
+        while (current != NULL) {
+            printf("%d\t%d\t%d\n", current->block_id, current->start_address, current->end_address);
+            current = current->next;
+        }
+    }
+
+    // Free all memory function
+    void free_memory() {
+        // Implement free all memory blocks
+
+    }
 
 int main() {
     int choice;
@@ -52,28 +90,29 @@ int main() {
                 enter_parameters();
                 break;
             case 2:
-                allocate_memory(1); // First-fit
+                allocate_memory_first_fit(); // First-fit
+                print_blocks();
                 break;
             case 3:
-                allocate_memory(2); // Best-fit
+                allocate_memory_best_fit(); // Best-fit
+                print_blocks();
                 break;
             case 4:
                 deallocate_memory();
+                print_blocks();
                 break;
             case 5:
                 defragment_memory();
+                print_blocks();
                 break;
             case 6:
+                free_memory();
                 printf("Quitting program...\n");
-                // Implement free all memory blocks
-
                 return 0;
             default:
                 printf("Invalid choice. Please enter a number between 1 and 6.\n");
-        }
-        // Print blocks after each operation
-    print_blocks();
+        } // end switch case
     } // end while loop
-    
+
     return 0;
 }
