@@ -32,8 +32,79 @@
 
     // Allocate memory function
     void allocate_memory_first_fit() {
+        int id, size;
 
+        printf("Enter block id: ");
+        scanf("%d", &id);
+        printf("Enter block size: ");
+        scanf("%d", &size);
+
+        // Check for duplicate IDs
+        memory_block *current = head;
+        while (current != NULL) {
+            if (current->block_id == id) {
+                printf("Error: Block ID already exists.\n");
+                return;
+            }
+            current = current->next;
+        }
+
+    int start = 0;
+    if (head == NULL) {
+        if (size <= physical_memory_size) {
+            start = 0; // Start at the beginning if the list is empty and there's enough space
+        }
+    } else {
+        memory_block *prev = NULL;
+        current = head;
+        while (current != NULL) {
+            if (prev == NULL) { // Check space before the first block
+                if (current->start_address >= size) {
+                    start = 0;
+                    break;
+                }
+            } else { // Check space between blocks
+                int gap = current->start_address - prev->end_address;
+                if (gap >= size) {
+                    start = prev->end_address;
+                    break;
+                }
+            }
+            prev = current;
+            current = current->next;
+        }
+        if (current == NULL && (physical_memory_size - (prev ? prev->end_address : 0) >= size)) {
+            start = prev ? prev->end_address : 0; // Check space at the end
+        }
     }
+
+        if (start + size > physical_memory_size) {
+            printf("Error: No suitable block found.\n");
+            return;
+        }
+
+        memory_block *new_block = (memory_block *)malloc(sizeof(memory_block));
+        new_block->block_id = id;
+        new_block->start_address = start;
+        new_block->end_address = start + size;
+        new_block->next = NULL;
+
+    if (head == NULL || head->start_address > start) {
+        new_block->next = head;
+        head = new_block;
+    } else {
+        memory_block *current = head;
+        memory_block *prev = NULL;
+        while (current != NULL && current->start_address < start) {
+            prev = current;
+            current = current->next;
+        }
+        new_block->next = current;
+        if (prev != NULL) {
+            prev->next = new_block;
+        }
+    }
+}
 
     // Allocate memory function
     void allocate_memory_best_fit() {
@@ -53,8 +124,9 @@
     // Print blocks function
     void print_blocks() {
         memory_block *current = head;
-        printf("ID     \tStart Address\tEnd Address\n");
-        printf("--------------------------------------\n");
+        printf("\n");
+        printf("ID\tStart\tEnd \n");
+        printf("-------------------\n");
         while (current != NULL) {
             printf("%d\t%d\t%d\n", current->block_id, current->start_address, current->end_address);
             current = current->next;
