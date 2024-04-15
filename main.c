@@ -22,7 +22,7 @@
     void deallocate_memory();
     void defragment_memory();
     void print_blocks();
-    void free_all_memory();
+    void free_memory();
 
     // Enter parameters function
     void enter_parameters() {
@@ -38,6 +38,12 @@
         scanf("%d", &id);
         printf("Enter block size: ");
         scanf("%d", &size);
+
+        // Check for invalid input
+        if (id < 0 || size <= 0) {
+        printf("Error: Block ID and size must be positive.\n");
+        return;
+        }
 
         // Check for duplicate IDs
         memory_block *current = head;
@@ -107,9 +113,83 @@
 }
 
     // Allocate memory function
-    void allocate_memory_best_fit() {
+void allocate_memory_best_fit() {
+    int id, size;
 
+    printf("Enter block id: ");
+    scanf("%d", &id);
+    printf("Enter block size: ");
+    scanf("%d", &size);
+
+    // Check for invalid input
+    if (id < 0 || size <= 0) {
+        printf("Error: Block ID and size must be positive.\n");
+        return;
     }
+
+    // Check for duplicate IDs
+    memory_block *current = head;
+    while (current != NULL) {
+        if (current->block_id == id) {
+            printf("Error: Block ID already exists.\n");
+            return;
+        }
+        current = current->next;
+    }
+
+    int best_start = -1;
+    int min_gap = physical_memory_size + 1; // Initialize with max possible size
+    int start = 0;
+
+    memory_block *prev = NULL;
+    current = head;
+    while (current != NULL) {
+        int gap = (prev == NULL ? current->start_address : current->start_address - prev->end_address);
+        if (gap >= size && gap < min_gap) {
+            best_start = (prev == NULL ? 0 : prev->end_address);
+            min_gap = gap;
+        }
+        prev = current;
+        current = current->next;
+    }
+    // Check the gap between last block and the end of the physical memory
+    if (prev != NULL && (physical_memory_size - prev->end_address >= size) && (physical_memory_size - prev->end_address < min_gap)) {
+        best_start = prev->end_address;
+        min_gap = physical_memory_size - prev->end_address;
+    }
+
+    if (best_start == -1) {
+        printf("Error: No suitable block found.\n");
+        return;
+    }
+
+    memory_block *new_block = (memory_block *)malloc(sizeof(memory_block));
+    if (new_block == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        return;
+    }
+    new_block->block_id = id;
+    new_block->block_size = size;
+    new_block->start_address = best_start;
+    new_block->end_address = best_start + size;
+    new_block->next = NULL;
+
+    if (head == NULL || head->start_address > best_start) {
+        new_block->next = head;
+        head = new_block;
+    } else {
+        prev = NULL;
+        current = head;
+        while (current != NULL && current->start_address < best_start) {
+            prev = current;
+            current = current->next;
+        }
+        new_block->next = current;
+        if (prev != NULL) {
+            prev->next = new_block;
+        }
+    }
+}
 
     // Deallocate memory function
     void deallocate_memory() {
