@@ -215,9 +215,16 @@ void allocate_memory_best_fit() {
 
     // Free all memory function
     void free_memory() {
-        // Implement free all memory blocks
-
+        memory_block *current = head;
+        while (current != NULL) {
+            memory_block *temp = current;
+            current = current->next;
+            free(temp); // Free each memory block
+        }
+        head = NULL; // Reset the head to NULL after freeing all blocks
+        printf("Memory freed.\n");
     }
+
 
 int main() {
     int choice;
