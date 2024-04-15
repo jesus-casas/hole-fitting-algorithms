@@ -90,7 +90,12 @@
         }
 
         memory_block *new_block = (memory_block *)malloc(sizeof(memory_block));
+        if (new_block == NULL) {
+            printf("Error: Memory allocation failed.\n");
+            return;
+        }
         new_block->block_id = id;
+        new_block->block_size = size;  // Ensure this line correctly sets the block size
         new_block->start_address = start;
         new_block->end_address = start + size;
         new_block->next = NULL;
@@ -112,7 +117,7 @@
     }
 }
 
-    // Allocate memory function
+// Allocate memory function
 void allocate_memory_best_fit() {
     int id, size;
 
@@ -191,15 +196,51 @@ void allocate_memory_best_fit() {
     }
 }
 
-    // Deallocate memory function
-    void deallocate_memory() {
+// Deallocate memory function
+void deallocate_memory() {
+    int block_id;
+    printf("Enter block ID to deallocate: ");
+    scanf("%d", &block_id);
 
+    memory_block *current = head, *prev = NULL;
+    while (current != NULL) {
+        if (current->block_id == block_id) {
+            if (prev == NULL) { // Block is at the head of the list
+                head = current->next;
+            } else { // Block is in the middle or end
+                prev->next = current->next;
+            }
+            free(current);
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+}
+    
+// Defragment memory function
+void defragment_memory() {
+    if (head == NULL || head->next == NULL) {
+        printf("No need to defragment: less than two blocks are allocated.\n");
+        return;
     }
 
-    // Defragment memory function
-    void defragment_memory() {
+    // Initialize the first block
+    head->start_address = 0;
+    head->end_address = head->start_address + head->block_size;
 
+    memory_block *current = head->next;
+    memory_block *prev = head;
+
+    // Adjust each subsequent block
+    while (current != NULL) {
+        current->start_address = prev->end_address;
+        current->end_address = current->start_address + current->block_size;
+
+        prev = current;
+        current = current->next;
     }
+}
 
     // Print blocks function
     void print_blocks() {
