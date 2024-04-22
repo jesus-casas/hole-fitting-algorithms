@@ -21,7 +21,11 @@ Each deallocation request prompts for the block id. If the block id is invalid, 
 Defragmentation compacts the blocks to be contiguous, and coalesces the holes into one hole at the far--right end (highest memory addresses) of physical memory.
 
 ## How to run
+Clone Repo
 
+Compile Code MacOS command line command using gcc is gcc main.c -o main
+
+Run code ./main
 
 ## Test input 
 1
@@ -60,4 +64,3 @@ Defragmentation compacts the blocks to be contiguous, and coalesces the holes in
 5
 
 6
-
